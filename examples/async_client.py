@@ -10,7 +10,7 @@ import sys
 myname = sys.argv[1]
 
 import sys, os
-libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'pythonlibs')
+libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'lib')
 if os.path.isdir(libs_dir):                                       
     sys.path.append(libs_dir)
 import zmq_utilities
