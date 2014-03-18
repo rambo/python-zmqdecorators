@@ -259,24 +259,22 @@ def call(service_name, method, *args):
 class sync_return_wrapper():
     return_value = None
     ready = False
-    def callback(*args):
+
+    def callback(self, *args):
         self.return_value = args
         self.ready = True
+        ioloop.IOLoop.instance().stop()
+
 
 def call_sync(service_name, method, *args):
-    """Sync method calling, will block untill a response matching this request is received"""
+    """Sync method calling, will block untill a response matching this request is received. NOTE: Never use this if you use the ioloop for something (since this will play merry hell with starting and stopping the ioloop)"""
     if isinstance(service_name, zmq_bonjour_connect_wrapper):
         stream_wrapper = service_name
     else:
         stream_wrapper = ct.get_by_name_or_create(service_name, zmq.DEALER)
-
     cb_wrapper = sync_return_wrapper()
-    # TODO: How to recognize which call is which... (in case someone mixed async and sync calls...)
-    # TODO: How to live with the fact that there might be no ioloop running ??
     stream_wrapper.stream.on_recv(cb_wrapper.callback)
     call(service_name, method, *args)
-    while not cb_wrapper.ready:
-        time.sleep(0) # Yield
-    stream_wrapper.on_recv(None)
+    ioloop.IOLoop.instance().start()
     return cb_wrapper.return_value
 

@@ -18,9 +18,8 @@ import zmq_utilities
 service_name="test_asyncrpc"
 
 
-while(True):
-    data = "%d" % random.randint(0,100000)
-    resp = zmq_utilities.call_sync(service_name, "beer", data)
-    print "got %s" % (repr(args))
-    time.sleep(0.100)
+data = "%d" % random.randint(0,100000)
+resp = zmq_utilities.call_sync(service_name, "beer", data)
+print "got %s" % (repr(resp))
+
 
