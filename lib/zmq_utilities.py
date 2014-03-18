@@ -255,7 +255,28 @@ def call(service_name, method, *args):
         wrapper = ct.get_by_name_or_create(service_name, zmq.DEALER)
     wrapper.stream.send_multipart([method, ] + list(args))
     
+
+class sync_return_wrapper():
+    return_value = None
+    ready = False
+    def callback(*args):
+        self.return_value = args
+        self.ready = True
+
 def call_sync(service_name, method, *args):
     """Sync method calling, will block untill a response matching this request is received"""
-    raise NotImplementedError
+    if isinstance(service_name, zmq_bonjour_connect_wrapper):
+        stream_wrapper = service_name
+    else:
+        stream_wrapper = ct.get_by_name_or_create(service_name, zmq.DEALER)
+
+    cb_wrapper = sync_return_wrapper()
+    # TODO: How to recognize which call is which... (in case someone mixed async and sync calls...)
+    # TODO: How to live with the fact that there might be no ioloop running ??
+    stream_wrapper.stream.on_recv(cb_wrapper.callback)
+    call(service_name, method, *args)
+    while not cb_wrapper.ready:
+        time.sleep(0) # Yield
+    stream_wrapper.on_recv(None)
+    return cb_wrapper.return_value
 
