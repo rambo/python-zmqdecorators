@@ -81,7 +81,7 @@ class bonjour_registrar(object):
 
     def _register_callback(self, sdRef, flags, errorCode, name, regtype, domain):
         if errorCode == pybonjour.kDNSServiceErr_NoError:
-            print "Registered service", name,regtype,domain
+            print "Registered service %s%s%s" % (name,regtype,domain)
             self.registered = (name, regtype, domain)
         else:
             print "Error",errorCode
