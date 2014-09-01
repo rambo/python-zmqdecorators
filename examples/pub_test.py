@@ -4,11 +4,11 @@ from zmq.eventloop import ioloop
 from zmq.eventloop.zmqstream import ZMQStream
 ioloop.install()
 
-import sys, os
-libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'zmqdecorators')
-if os.path.isdir(libs_dir):                                       
-    sys.path.append(libs_dir)
-import bonjour_utilities
+#import sys, os
+#libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..')
+#if os.path.isdir(libs_dir):                                       
+#    sys.path.append(libs_dir)
+from zmqdecorators import bonjour_utilities
 
 
 import itertools

@@ -4,14 +4,14 @@ from zmq.eventloop import ioloop
 from zmq.eventloop.zmqstream import ZMQStream
 ioloop.install()
 
-import sys, os
-libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'zmqdecorators')
-if os.path.isdir(libs_dir):                                       
-    sys.path.append(libs_dir)
-import zmq_utilities
+#import sys, os
+#libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'zmqdecorators')
+#if os.path.isdir(libs_dir):                                       
+#    sys.path.append(libs_dir)
+import zmqdecorators
 
 
-wrapper = zmq_utilities.zmq_bonjour_connect_wrapper(zmq.SUB, "test_pubsub")
+wrapper = zmqdecorators.zmq_bonjour_connect_wrapper(zmq.SUB, "test_pubsub")
 
 def test_callback(data):
     print "in test_callback got %s" % repr(data)

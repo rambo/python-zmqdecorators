@@ -173,16 +173,16 @@ class server_tracker(object):
             return self.by_names[key]
         return None
 
-    def create(self, service_name, socket_type):
+    def create(self, service_name, socket_type, port=None):
         service_type = service_type = socket_type_to_service(socket_type)
         key = "%s%s" % (service_name, service_type)
-        self.by_names[key] = zmq_bonjour_bind_wrapper(socket_type, service_name)
+        self.by_names[key] = zmq_bonjour_bind_wrapper(socket_type, service_name, port)
         return self.by_names[key]
 
-    def get_by_name_or_create(self, service_name, socket_type):
+    def get_by_name_or_create(self, service_name, socket_type, port=None):
         r = self.get_by_name(service_name, socket_type)
         if not r:
-            r = self.create(service_name, socket_type)
+            r = self.create(service_name, socket_type, port)
         return r
 
 dt = server_tracker()
@@ -192,8 +192,8 @@ class signal(object):
     wrapper = None
     stream = None
 
-    def __init__(self, service_name):
-        self.wrapper = dt.get_by_name_or_create(service_name, zmq.PUB)
+    def __init__(self, service_name, port=None):
+        self.wrapper = dt.get_by_name_or_create(service_name, zmq.PUB, port=None)
         self.stream = self.wrapper.stream
 
     def __call__(self, f):
@@ -208,8 +208,8 @@ class method(object):
     wrapper = None
     stream = None
 
-    def __init__(self, service_name):
-        self.wrapper = dt.get_by_name_or_create(service_name, zmq.ROUTER)
+    def __init__(self, service_name, port=None):
+        self.wrapper = dt.get_by_name_or_create(service_name, zmq.ROUTER, port)
         self.stream = self.wrapper.stream
 
     def __call__(self, f):

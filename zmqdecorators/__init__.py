@@ -3,4 +3,4 @@ from zmq_utilities import signal
 from zmq_utilities import method
 from zmq_utilities import call 
 from zmq_utilities import call_sync
-
+from zmq_utilities import zmq_bonjour_connect_wrapper
