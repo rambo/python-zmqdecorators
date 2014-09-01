@@ -301,7 +301,7 @@ def subscribe_topic(service_name, topic, callback):
     wrapper.add_topic_callback(topic, callback)
 
 def subscribe_all(service_name, callback):
-    """Subscribes to the given topic on the given service name (which must be of type zmq.PUB)"""
+    """Subscribes to the given topic on the given service name (which must be of type zmq.PUB) NOTE: this callback must accept any number of arguments!"""
     if isinstance(service_name, zmq_bonjour_connect_wrapper):
         wrapper = service_name
     else:

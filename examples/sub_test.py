@@ -12,12 +12,15 @@ import zmqdecorators
 
 
 def bottles_callback(data):
+    """Since we know the exact amount and order of arguments we can get away with not adding *args. Whether adding it to avoid choking in case for channel
+    format changes is a good idea depends on your circumstances (sometimes it's better to catch the change early"""
     print "in bottles_callback got %s" % repr(data)
 
 def slices_callback(data):
     print "in slices_callback got %s" % repr(data)
 
 def all_callback(*args):
+    """The generic callback MUST accept any number of arguments (including zero)"""
     print "in all_callback got %s" % repr(args)
 
 zmqdecorators.subscribe_topic("test_pubsub", "bottles", bottles_callback)

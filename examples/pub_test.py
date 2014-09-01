@@ -16,14 +16,13 @@ import random
 service_name="test_pubsub"
 service_port=5555 # Set to None for random port
 
-
-topic = itertools.cycle(('test','foo','bar'))
-
 @zmqdecorators.signal(service_name, service_port)
 def bottles(n):
+    """What this function actually does, does not matter to the ZMQ PUBlish, the function name is the topic and function arguments rest of the message parts"""
     pass
 
 def bottles_caller():
+    """We call this function from the eventloop so we have a nice random argument to pass to the bottles-signal"""
     n = random.randint(0,100000)
     data = "%s bottles of beer on the wall" % n
     print data
