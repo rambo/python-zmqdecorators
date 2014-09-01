@@ -1,9 +1,11 @@
 from distutils.core import setup
 import subprocess
 
+git_version = str(subprocess.check_output(['git', 'rev-parse', '--verify', '--short', 'HEAD'])).strip()
+
 setup(
     name='zmqdecorators',
-    version='0.5.dev-' + subprocess.check_output(['git', 'rev-parse', '--verify', '--short', 'HEAD']),
+    version='0.5.dev-%s' % git_version,
     packages=['zmqdecorators',],
     license='GNU LGPL',
     long_description=open('README.md').read(),
