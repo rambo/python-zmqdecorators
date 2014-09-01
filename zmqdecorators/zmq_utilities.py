@@ -104,6 +104,7 @@ class zmq_bonjour_connect_wrapper(object):
     heartbeat_received = None
     heartbeat_timeout = 5000
     topic_callbacks = {}
+    recv_callbacks = []
 
     def __init__(self, socket_type, service_name, service_port=None, service_type=None):
         self.reconnect(socket_type, service_name, service_port=None, service_type=None)
@@ -117,6 +118,8 @@ class zmq_bonjour_connect_wrapper(object):
         #print "Heartbeat time %d" % self.heartbeat_received
 
     def _topic_callback_wrapper(self, datalist):
+        for f in self.recv_callbacks:
+            f(*datalist)
         topic = datalist[0]
         args = datalist[1:]
         #print "DEBUG: _topic_callback_wrapper(%s, %s)" % (topic, repr(args))
@@ -153,6 +156,9 @@ class zmq_bonjour_connect_wrapper(object):
 
     def _subscribe_topic(self, topic):
         self.socket.setsockopt(zmq.SUBSCRIBE, topic)
+
+    def add_recv_callback(self, callback):
+        self.recv_callbacks.append(callback)        
 
     def add_topic_callback(self, topic, callback):
         if not self.topic_callbacks.has_key(topic):
@@ -284,4 +290,21 @@ def call_sync(service_name, method, *args):
     call(service_name, method, *args)
     ioloop.IOLoop.instance().start()
     return cb_wrapper.return_value
+
+
+def subscribe_topic(service_name, topic, callback):
+    """Subscribes to the given topic on the given service name (which must be of type zmq.PUB)"""
+    if isinstance(service_name, zmq_bonjour_connect_wrapper):
+        wrapper = service_name
+    else:
+        wrapper = ct.get_by_name_or_create(service_name, zmq.SUB)
+    wrapper.add_topic_callback(topic, callback)
+
+def subscribe_all(service_name, callback):
+    """Subscribes to the given topic on the given service name (which must be of type zmq.PUB)"""
+    if isinstance(service_name, zmq_bonjour_connect_wrapper):
+        wrapper = service_name
+    else:
+        wrapper = ct.get_by_name_or_create(service_name, zmq.SUB)
+    wrapper.add_recv_callback(callback)
 

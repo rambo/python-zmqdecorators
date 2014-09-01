@@ -11,16 +11,19 @@ ioloop.install()
 import zmqdecorators
 
 
-wrapper = zmqdecorators.zmq_bonjour_connect_wrapper(zmq.SUB, "test_pubsub")
-
 def bottles_callback(data):
     print "in bottles_callback got %s" % repr(data)
 
 def slices_callback(data):
     print "in slices_callback got %s" % repr(data)
 
-wrapper.add_topic_callback("bottles", bottles_callback)
-wrapper.add_topic_callback("slices", slices_callback)
+def all_callback(*args):
+    print "in all_callback got %s" % repr(args)
+
+zmqdecorators.subscribe_topic("test_pubsub", "bottles", bottles_callback)
+zmqdecorators.subscribe_topic("test_pubsub", "slices", slices_callback)
+zmqdecorators.subscribe_all("test_pubsub", all_callback)
+
 
 print "starting ioloop"
 ioloop.IOLoop.instance().start()
