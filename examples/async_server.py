@@ -13,13 +13,13 @@ import zmqdecorators
 
 service_name="test_asyncrpc"
 
-@zmqdecorators.method(service_name)
+@zmqdecorators.method(service_name, 6900)
 def beer(bottles):
     bottles = int(bottles)
     print "Sending bottles as reply"
     return "Here's %d bottles of beer" % bottles
 
-@zmqdecorators.method(service_name)
+@zmqdecorators.method(service_name, 6901)
 def food(arg):
     print "Sending noms as reply"
     return "Here's %s for the noms" % arg

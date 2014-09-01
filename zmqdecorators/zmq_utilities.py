@@ -6,6 +6,7 @@ from zmq.eventloop.zmqstream import ZMQStream
 import time
 import bonjour_utilities
 from functools import partial
+from exceptions import RuntimeError
 
 
 def socket_type_to_service(socket_type):
@@ -40,6 +41,7 @@ class zmq_bonjour_bind_wrapper(object):
     stream = None
     heartbeat_timer = None
     method_callbacks = {}
+    port = None
 
 
     def _hearbeat(self):
@@ -54,6 +56,7 @@ class zmq_bonjour_bind_wrapper(object):
         else:
             self.socket.bind("tcp://*:%d" % service_port)
         print "Bound to port %d" % service_port
+        self.port = service_port
 
         self.stream = ZMQStream(self.socket)
         if not service_type:
@@ -183,6 +186,9 @@ class server_tracker(object):
         r = self.get_by_name(service_name, socket_type)
         if not r:
             r = self.create(service_name, socket_type, port)
+        if port:
+            if not port == r.port:
+                raise RuntimeError("Tried to bind name %s to port %d but it has already been bound to %d" % (service_name, port, r.port))
         return r
 
 dt = server_tracker()
