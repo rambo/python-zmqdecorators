@@ -46,7 +46,7 @@ class bonjour_resolver(object):
 
         if (    self.name_filter
             and serviceName != self.name_filter):
-            print "Found service '%s' but it does not match '%s'" % (serviceName, self.name_filter)
+            #print "Found service '%s' but it does not match '%s'" % (serviceName, self.name_filter)
             return 
 
         resolve_sdRef = pybonjour.DNSServiceResolve(
@@ -62,7 +62,7 @@ class bonjour_resolver(object):
             while not self.resolved:
                 ready = select.select([resolve_sdRef], [], [], self.timeout)
                 if resolve_sdRef not in ready[0]:
-                    print 'Resolve timed out'
+                    #print 'Resolve timed out'
                     self.resolve_error = True
                     break
                 pybonjour.DNSServiceProcessResult(resolve_sdRef)
@@ -81,10 +81,10 @@ class bonjour_registrar(object):
 
     def _register_callback(self, sdRef, flags, errorCode, name, regtype, domain):
         if errorCode == pybonjour.kDNSServiceErr_NoError:
-            print "Registered service %s%s%s" % (name,regtype,domain)
+            #print "Registered service %s%s%s" % (name,regtype,domain)
             self.registered = (name, regtype, domain)
         else:
-            print "Error",errorCode
+            #print "Error",errorCode
             self.register_error = True
 
     def _process_callback(self, fd, events, sdRef=None):

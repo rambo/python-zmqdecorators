@@ -55,7 +55,7 @@ class zmq_bonjour_bind_wrapper(object):
             service_port = self.socket.bind_to_random_port('tcp://*', min_port=49152, max_port=65535, max_tries=100)
         else:
             self.socket.bind("tcp://*:%d" % service_port)
-        print "Bound to port %d" % service_port
+        #print "Bound to port %d" % service_port
         self.port = service_port
 
         self.stream = ZMQStream(self.socket)
@@ -82,8 +82,9 @@ class zmq_bonjour_bind_wrapper(object):
         args = datalist[2:]
         #print "DEBUG: _method_callback_wrapper(%s, %s)" % (method, repr(args))
         if not self.method_callbacks.has_key(method):
-            print "No such method: %s" % method
-            print "Methods: %s" % self.method_callbacks.keys()
+            raise RuntimeError("No such method: %s" % method)
+            #print "No such method: %s" % method
+            #print "Methods: %s" % self.method_callbacks.keys()
             return
         for f in self.method_callbacks[method]:
             resp = zmq_client_response(client_id, self.stream)
