@@ -10,7 +10,7 @@ import time
 import sys
 
 import sys, os
-libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'lib')
+libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'zmqdecorators')
 if os.path.isdir(libs_dir):                                       
     sys.path.append(libs_dir)
 import zmq_utilities
