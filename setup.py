@@ -6,6 +6,8 @@ git_version = str(subprocess.check_output(['git', 'rev-parse', '--verify', '--sh
 setup(
     name='zmqdecorators',
     version='0.5.dev-%s' % git_version,
+    author='Eero "rambo" af Heurlin',
+    author_email='rambo@iki.fi',
     packages=['zmqdecorators',],
     license='GNU LGPL',
     long_description=open('README.md').read(),
