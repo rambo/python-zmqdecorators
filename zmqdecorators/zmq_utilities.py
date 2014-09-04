@@ -228,7 +228,7 @@ class signal(object):
         return wrapped_f
 
 class method(object):
-    """This exposes the decorated function as async RPC method, return value is sent back to client but unless that data (and the request params) contain some transaction id client cannot be sure which call a response corresponds to"""
+    """This exposes the decorated function as async RPC method, use the passed client_response instance to send data back, note: unless that data (and the request params) contain some transaction id client cannot be sure which call a response corresponds to"""
     wrapper = None
     stream = None
 
