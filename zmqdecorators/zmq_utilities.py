@@ -6,7 +6,6 @@ from zmq.eventloop.zmqstream import ZMQStream
 import time
 import uuid
 import bonjour_utilities
-from functools import partial
 from exceptions import RuntimeError
 
 
