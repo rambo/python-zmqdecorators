@@ -5,6 +5,7 @@ ioloop.install()
 from zmq.eventloop.zmqstream import ZMQStream
 import time
 import uuid
+import functools
 import bonjour_utilities
 from exceptions import RuntimeError
 
@@ -35,15 +36,13 @@ class zmq_client_response(object):
     def send(self, *args):
         self.stream.send_multipart([self.client_id, ] + list(args))
 
-class zmq_bonjour_bind_wrapper(object):
-    """Connects to a ZMQ socket by the name, handles callbacks for methods etc"""
+class zmq_bonjour_bind_base(object):
+    """Binds to a ZMQ socket by the name"""
     context = None
     socket = None
     stream = None
     heartbeat_timer = None
-    method_callbacks = {}
     port = None
-
 
     def _hearbeat(self):
         #print "Sending heartbeat"
@@ -68,10 +67,18 @@ class zmq_bonjour_bind_wrapper(object):
             self.heartbeat_timer = ioloop.PeriodicCallback(self._hearbeat, 1000)
             self.heartbeat_timer.start()
 
+        bonjour_utilities.register_ioloop(ioloop.IOLoop.instance(), service_type, service_name, service_port)
+
+
+class zmq_bonjour_bind_wrapper(zmq_bonjour_bind_base):
+    """Binds to a ZMQ socket by the name, handles callbacks for decorated simple functions"""
+    method_callbacks = {}
+
+    def __init__(self, socket_type, service_name, service_port=None, service_type=None):
+        super(zmq_bonjour_bind_wrapper, self).__init__(socket_type, service_name, service_port, service_type)
+
         if socket_type == zmq.ROUTER:
             self.stream.on_recv(self._method_callback_wrapper)
-
-        bonjour_utilities.register_ioloop(ioloop.IOLoop.instance(), service_type, service_name, service_port)
 
     def _method_callback_wrapper(self, datalist):
         #print "_method_callback_wrapper called: %s" % repr(datalist)
@@ -97,6 +104,31 @@ class zmq_bonjour_bind_wrapper(object):
             self.method_callbacks[name] = []
         self.method_callbacks[name].append(callback)
 
+
+class service(zmq_bonjour_bind_wrapper):
+    """Baseclass for services in ZMQ with RPC methods"""
+    def __init__(self, service_name, service_port=None, service_type=None):
+        super(service, self).__init__(zmq.ROUTER, service_name, service_port, service_type)
+        self.stream.on_recv(self._method_callback_wrapper)
+
+    def _method_callback_wrapper(self, datalist):
+        if len(datalist) < 2:
+            # Invalid call (no client-id and no method name)
+            return
+        client_id = datalist[0]
+        method = datalist[1]
+        args = datalist[2:]
+        
+        try:
+            f = getattr(self, method)
+            #print("f.__dict__\n==\n%s\n===\n" % repr(f.__dict__))
+            if not '_method__zmqdecorators_is_method' in f.__dict__:
+                raise RuntimeError("No such method: %s" % method)
+            resp = zmq_client_response(client_id, self.stream)
+            f(resp, *args)
+
+        except AttributeError,e:
+            raise RuntimeError("No such method: %s" % method)
 
 
 class zmq_bonjour_connect_wrapper(object):
@@ -235,16 +267,25 @@ class method(object):
     wrapper = None
     stream = None
 
-    def __init__(self, service_name, port=None):
-        self.wrapper = dt.get_by_name_or_create(service_name, zmq.ROUTER, port)
-        self.stream = self.wrapper.stream
+    def __init__(self, service_name=None, port=None):
+        if service_name:
+            # This is the case for simple functions decorated where we need to create a wrapper class to track them
+            self.wrapper = dt.get_by_name_or_create(service_name, zmq.ROUTER, port)
+            self.stream = self.wrapper.stream
 
     def __call__(self, f):
-        method = f.__name__
-        def wrapped_f(resp, *args):
-            f(resp, *args)
-        self.wrapper.register_method(method, wrapped_f)
-        return wrapped_f
+        if self.wrapper:
+            # This is the case for simle functions
+            method = f.__name__
+            def wrapped_f(*args):
+                f(*args)
+            self.wrapper.register_method(method, wrapped_f)
+            return wrapped_f
+        else:
+            # And this for class methods
+            f.__zmqdecorators_is_method = True
+            return f
+
 
 
 class client_tracker(object):
