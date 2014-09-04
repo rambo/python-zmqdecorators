@@ -17,7 +17,8 @@ service_name="test_asyncrpc"
 
 
 data = "%d" % random.randint(0,100000)
-resp = zmqdecorators.call_sync(service_name, "beer", data)
+data2 = "%d" % random.randint(0,10)
+resp = zmqdecorators.call_sync(service_name, "beer", data, data2)
 print "got %s" % (repr(resp))
 
 
