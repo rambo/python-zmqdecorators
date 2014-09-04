@@ -37,6 +37,7 @@ class zmq_client_response(object):
         self.stream.send_multipart([self.client_id, ] + list(args))
 
 class zmq_bonjour_bind_wrapper(object):
+    """Connects to a ZMQ socket by the name, handles callbacks for methods etc"""
     context = None
     socket = None
     stream = None
@@ -100,6 +101,7 @@ class zmq_bonjour_bind_wrapper(object):
 
 
 class zmq_bonjour_connect_wrapper(object):
+    """Connects to a ZMQ socket by the name, handles callbacks for pubsub topics etc"""
     context = None
     socket = None
     stream = None
@@ -182,6 +184,7 @@ class zmq_bonjour_connect_wrapper(object):
 
 
 class server_tracker(object):
+    """Used to keep track of bound services by their names"""
     by_names = {}
 
     def __init__(self):
@@ -227,6 +230,7 @@ class signal(object):
             f(*args)
         return wrapped_f
 
+
 class method(object):
     """This exposes the decorated function as async RPC method, use the passed client_response instance to send data back, note: unless that data (and the request params) contain some transaction id client cannot be sure which call a response corresponds to"""
     wrapper = None
@@ -245,6 +249,7 @@ class method(object):
 
 
 class client_tracker(object):
+    """Used to keep track of connections to services by their names"""
     by_names = {}
 
     def __init__(self):
@@ -270,6 +275,8 @@ class client_tracker(object):
         return r
 
 ct = client_tracker()
+
+
 def call(service_name, method, *args):
     """Async method calling wrapper, does not return anything you will need to catch any responses the server might send some other way"""
     if isinstance(service_name, zmq_bonjour_connect_wrapper):
@@ -309,6 +316,7 @@ def subscribe_topic(service_name, topic, callback):
     else:
         wrapper = ct.get_by_name_or_create(service_name, zmq.SUB)
     wrapper.add_topic_callback(topic, callback)
+
 
 def subscribe_all(service_name, callback):
     """Subscribes to the given topic on the given service name (which must be of type zmq.PUB) NOTE: this callback must accept any number of arguments!"""
