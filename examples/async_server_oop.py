@@ -28,7 +28,7 @@ class myserver(zmqdecorators.service):
         drinkers = int(drinkers)
         print "Sending bottles as reply"
         resp.send("Here's %d bottles of beer for %d drinkers" % (bottles, drinkers))
-    
+
     @zmqdecorators.method()
     def food(self, resp, arg, arg2):
         print "Sending noms as reply"
