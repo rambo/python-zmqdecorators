@@ -4,6 +4,7 @@ from zmq.eventloop import ioloop
 ioloop.install()
 from zmq.eventloop.zmqstream import ZMQStream
 import time
+import uuid
 import bonjour_utilities
 from functools import partial
 from exceptions import RuntimeError
@@ -105,8 +106,14 @@ class zmq_bonjour_connect_wrapper(object):
     heartbeat_timeout = 5000
     topic_callbacks = {}
     recv_callbacks = []
+    uuid = None
+    identity = None
 
-    def __init__(self, socket_type, service_name, service_port=None, service_type=None):
+    def __init__(self, socket_type, service_name, service_port=None, service_type=None, identity=None):
+        self.uuid = uuid.uuid4()
+        if not identity:
+            self.identity = self.uuid.hex
+
         self.reconnect(socket_type, service_name, service_port=None, service_type=None)
         if socket_type == zmq.SUB:
             # TODO: how to handle this with ROUTER/DEALER combinations...
@@ -143,6 +150,7 @@ class zmq_bonjour_connect_wrapper(object):
 
         self.context = zmq.Context()
         self.socket = self.context.socket(socket_type)
+        self.socket.setsockopt(zmq.IDENTITY, self.identity)
         self.stream = ZMQStream(self.socket)
         connection_str =  "tcp://%s:%s" % (rr[1], rr[2])
         self.socket.connect(connection_str)
@@ -184,7 +192,7 @@ class server_tracker(object):
         return None
 
     def create(self, service_name, socket_type, port=None):
-        service_type = service_type = socket_type_to_service(socket_type)
+        service_type = socket_type_to_service(socket_type)
         key = "%s%s" % (service_name, service_type)
         self.by_names[key] = zmq_bonjour_bind_wrapper(socket_type, service_name, port)
         return self.by_names[key]
@@ -248,7 +256,7 @@ class client_tracker(object):
         return None
 
     def create(self, service_name, socket_type):
-        service_type = service_type = socket_type_to_service(socket_type)
+        service_type = socket_type_to_service(socket_type)
         key = "%s%s" % (service_name, service_type)
         self.by_names[key] = zmq_bonjour_connect_wrapper(socket_type, service_name)
         return self.by_names[key]
