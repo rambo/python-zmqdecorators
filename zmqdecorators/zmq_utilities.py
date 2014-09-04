@@ -98,6 +98,8 @@ class zmq_bonjour_bind_wrapper(object):
             self.method_callbacks[name] = []
         self.method_callbacks[name].append(callback)
 
+
+
 class zmq_bonjour_connect_wrapper(object):
     context = None
     socket = None
@@ -174,7 +176,9 @@ class zmq_bonjour_connect_wrapper(object):
             self._subscribe_topic(topic)
         self.topic_callbacks[topic].append(callback)
 
-    
+    def call(self, method, *args):
+        """Async method calling wrapper, does not return anything you will need to catch any responses the server might send some other way"""
+        self.stream.send_multipart([method, ] + list(args))
 
 
 
@@ -274,7 +278,7 @@ def call(service_name, method, *args):
         wrapper = service_name
     else:
         wrapper = ct.get_by_name_or_create(service_name, zmq.DEALER)
-    wrapper.stream.send_multipart([method, ] + list(args))
+    wrapper.call(method, *args)
     
 
 class sync_return_wrapper():
