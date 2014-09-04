@@ -1,4 +1,7 @@
-"""This exposes the decorators, if you need access to all of the helpers import zmq_utilities"""
+"""This exposes the decorators, if you need access to all of the helpers import zmq_utilities
+
+See examples at https://github.com/rambo/python-zmqdecorators/tree/master/examples
+"""
 from zmq_utilities import service
 from zmq_utilities import signal
 from zmq_utilities import method
