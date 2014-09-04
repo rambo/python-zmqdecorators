@@ -15,15 +15,16 @@ service_name="test_asyncrpc"
 service_port=6900 # Set to None for random port
 
 @zmqdecorators.method(service_name, service_port)
-def beer(bottles):
+def beer(resp, bottles, drinkers):
     bottles = int(bottles)
+    drinkers = int(drinkers)
     print "Sending bottles as reply"
-    return "Here's %d bottles of beer" % bottles
+    resp.send("Here's %d bottles of beer for %d drinkers" % (bottles, drinkers))
 
 @zmqdecorators.method(service_name, service_port)
-def food(arg):
+def food(resp, arg, arg2):
     print "Sending noms as reply"
-    return "Here's %s for the noms" % arg
+    resp.send("Here's %s for the noms (for %s)" % (arg, arg2))
 
 
 print "starting ioloop"

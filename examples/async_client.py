@@ -29,11 +29,12 @@ stream.on_recv(client_recv_callback)
 
 def send_random_data():
     data = "%d" % random.randint(0,100000)
+    data2 = "%d" % random.randint(0,10)
     #zmqdecorators.call(service_name, "beer", data)
-    zmqdecorators.call(wrapper, "beer", data)
+    zmqdecorators.call(wrapper, "beer", data, data2)
     if random.randint(0,1):
         #zmqdecorators.call(service_name, "food", data)
-        zmqdecorators.call(wrapper, "food", data)
+        zmqdecorators.call(wrapper, "food", data, data2)
         
 
 pcb = ioloop.PeriodicCallback(send_random_data, 100)

@@ -71,7 +71,6 @@ class zmq_bonjour_bind_wrapper(object):
         if socket_type == zmq.ROUTER:
             self.stream.on_recv(self._method_callback_wrapper)
 
-
         bonjour_utilities.register_ioloop(ioloop.IOLoop.instance(), service_type, service_name, service_port)
 
     def _method_callback_wrapper(self, datalist):
@@ -240,8 +239,7 @@ class method(object):
     def __call__(self, f):
         method = f.__name__
         def wrapped_f(resp, *args):
-            #print "calling f(%s)" % repr(args)
-            resp.send(f(*args))
+            f(resp, *args)
         self.wrapper.register_method(method, wrapped_f)
         return wrapped_f
 
