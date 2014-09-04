@@ -105,7 +105,7 @@ class zmq_bonjour_bind_wrapper(zmq_bonjour_bind_base):
         self.method_callbacks[name].append(callback)
 
 
-class service(zmq_bonjour_bind_wrapper):
+class service(zmq_bonjour_bind_base):
     """Baseclass for services in ZMQ with RPC methods"""
     def __init__(self, service_name, service_port=None, service_type=None):
         super(service, self).__init__(zmq.ROUTER, service_name, service_port, service_type)
