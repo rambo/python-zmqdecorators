@@ -9,7 +9,7 @@ Forked from <https://github.com/HelsinkiHacklab/reactor>
 ## Requirements
 
     sudo apt-get install python python-pip python-zmq python-tornado libavahi-compat-libdnssd1
-    sudo pip install pybonjour
+    sudo pip install pybonjour || sudo pip install --allow-external pybonjour --allow-unverified pybonjour pybonjour 
 
 Though pybonjour will be installed by pip automagically if you install this package with pip. 
 
