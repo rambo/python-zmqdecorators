@@ -177,7 +177,10 @@ class zmq_bonjour_connect_wrapper(object):
 
         if not service_type:
             service_type = socket_type_to_service(socket_type)
-        rr = bonjour_utilities.resolve(service_type, service_name)
+        if isinstance(service_name, (list, tuple)):
+            rr = [None, service_name[0], service_name[1]]
+        else:
+            rr = bonjour_utilities.resolve(service_type, service_name)
         if not rr:
             # TODO raise error or wait ??
             return
