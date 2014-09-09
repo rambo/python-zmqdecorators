@@ -59,7 +59,7 @@ class zmq_bonjour_bind_base(object):
             service_port = self.socket.bind_to_random_port('tcp://*', min_port=49152, max_port=65535, max_tries=100)
         else:
             self.socket.bind("tcp://*:%d" % service_port)
-        print("DEBUG: Bound '%s' to port %d" % (service_name, service_port))
+        #print("DEBUG: Bound '%s' to port %d" % (service_name, service_port))
         self.port = service_port
 
         self.stream = ZMQStream(self.socket)
@@ -198,14 +198,19 @@ class zmq_bonjour_connect_wrapper(object):
 
     def _topic_callback_wrapper(self, datalist):
         for f in self.recv_callbacks:
-            f(*datalist)
+            if f:
+                f(*datalist)
         topic = datalist[0]
-        args = datalist[1:]
-        print "DEBUG: _topic_callback_wrapper(%s, %s)" % (topic, repr(args))
+        if len(datalist) > 1:
+            args = datalist[1:]
+        else:
+            args = []
+        #print "DEBUG: _topic_callback_wrapper(%s, %s)" % (topic, repr(args))
         if not self.topic_callbacks.has_key(topic):
             return
         for f in self.topic_callbacks[topic]:
-            f(*args)
+            if f:
+                f(*args)
 
     def reconnect(self, socket_type, service_name, service_port=None, service_type=None):
         self.context = None
@@ -228,7 +233,7 @@ class zmq_bonjour_connect_wrapper(object):
         self.socket.setsockopt(zmq.IDENTITY, self.identity)
         self.stream = ZMQStream(self.socket)
         connection_str =  "tcp://%s:%s" % (rr[1], rr[2])
-        print("DEBUG: reconnect connection_str=%s" % connection_str)
+        #print("DEBUG: reconnect connection_str=%s" % connection_str)
         self.socket.connect(connection_str)
 
         # re-register the subscriptions
@@ -355,9 +360,14 @@ class signal(object):
             # This signal is a class method
             if (    len(args) >= 1
                 and isinstance(args[0], service_baseclass)):
-                self.stream.send_multipart([topic, ] + list(args[1:]))
+                send_args = args[1:]
             else:
-                self.stream.send_multipart([topic, ] + list(args))
+                send_args = args
+            if len(send_args) == 0:
+                #print("DEBUG: Sending topic with no args")
+                self.stream.send(topic)
+            else:
+                self.stream.send_multipart([topic, ] + list(send_args))
             f(*args)
         return wrapped_f
 
@@ -392,10 +402,8 @@ class client_tracker(tracker_baseclass):
     def create(self, service_name, socket_type):
         key = self._by_name_key(service_name, socket_type)
         self.by_names[key] = zmq_bonjour_connect_wrapper(socket_type, service_name)
-        print("DEBUG: client_tracker created key %s" % key)
+        #print("DEBUG: client_tracker created key %s" % key)
         return self.by_names[key]
-
-
 
 ct = client_tracker()
 

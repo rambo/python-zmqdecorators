@@ -20,10 +20,20 @@ class mypublisher(zmqdecorators.service):
     def __init__(self, service_name):
         super(mypublisher, self).__init__(service_name)
 
-        self.pcb = ioloop_mod.PeriodicCallback(self.bottles_caller, 100)
+        self.pcb = ioloop_mod.PeriodicCallback(self.bottles_caller, 500)
         self.pcb.start()
-        self.pcb2 = ioloop_mod.PeriodicCallback(self.slices_caller, 100)
+        self.pcb2 = ioloop_mod.PeriodicCallback(self.slices_caller, 500)
         self.pcb2.start()
+
+        self.pcb3 = ioloop_mod.PeriodicCallback(self.noargs, 500)
+        self.pcb3.start()
+
+
+    @zmqdecorators.signal(SERVICE_NAME, SIGNALS_PORT)
+    def noargs(self, *args):
+        """What this function actually does, does not matter to the ZMQ PUBlish, the function name is the topic and function arguments rest of the message parts"""
+        print "No args signal called"
+        pass
 
     @zmqdecorators.signal(SERVICE_NAME, SIGNALS_PORT)
     def bottles(self, n):
