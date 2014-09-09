@@ -59,7 +59,7 @@ class zmq_bonjour_bind_base(object):
             service_port = self.socket.bind_to_random_port('tcp://*', min_port=49152, max_port=65535, max_tries=100)
         else:
             self.socket.bind("tcp://*:%d" % service_port)
-        #print "Bound to port %d" % service_port
+        print("DEBUG: Bound '%s' to port %d" % (service_name, service_port))
         self.port = service_port
 
         self.stream = ZMQStream(self.socket)
@@ -201,7 +201,7 @@ class zmq_bonjour_connect_wrapper(object):
             f(*datalist)
         topic = datalist[0]
         args = datalist[1:]
-        #print "DEBUG: _topic_callback_wrapper(%s, %s)" % (topic, repr(args))
+        print "DEBUG: _topic_callback_wrapper(%s, %s)" % (topic, repr(args))
         if not self.topic_callbacks.has_key(topic):
             return
         for f in self.topic_callbacks[topic]:
@@ -228,6 +228,7 @@ class zmq_bonjour_connect_wrapper(object):
         self.socket.setsockopt(zmq.IDENTITY, self.identity)
         self.stream = ZMQStream(self.socket)
         connection_str =  "tcp://%s:%s" % (rr[1], rr[2])
+        print("DEBUG: reconnect connection_str=%s" % connection_str)
         self.socket.connect(connection_str)
 
         # re-register the subscriptions
@@ -291,23 +292,40 @@ class client_baseclass(object):
             self.cleanup()
 
 
-class server_tracker(object):
-    """Used to keep track of bound services by their names"""
+
+class tracker_baseclass(object):
+    """Used to keep track of connections to services by their names"""
     by_names = {}
 
     def __init__(self):
         pass
 
-    def get_by_name(self, service_name, socket_type):
+    def _by_name_key(self, service_name, socket_type):
         service_type = socket_type_to_service(socket_type)
-        key = "%s%s" % (service_name, service_type)
+        if isinstance(service_name, (list, tuple)):
+            key = "ip(%s:%s)/%s" % (service_name[0], service_name[1], service_type)
+        else:
+            key = "%s/%s" % (service_name, service_type)
+        return key
+
+    def get_by_name(self, service_name, socket_type):
+        key = self._by_name_key(service_name, socket_type)
         if self.by_names.has_key(key):
             return self.by_names[key]
         return None
 
+    def get_by_name_or_create(self, service_name, socket_type):
+        r = self.get_by_name(service_name, socket_type)
+        if not r:
+            r = self.create(service_name, socket_type)
+        return r
+
+
+class server_tracker(tracker_baseclass):
+    """Used to keep track of bound services by their names"""
+
     def create(self, service_name, socket_type, port=None):
-        service_type = socket_type_to_service(socket_type)
-        key = "%s%s" % (service_name, service_type)
+        key = self._by_name_key(service_name, socket_type)
         self.by_names[key] = zmq_bonjour_bind_wrapper(socket_type, service_name, port)
         return self.by_names[key]
 
@@ -328,7 +346,7 @@ class signal(object):
     stream = None
 
     def __init__(self, service_name, port=None):
-        self.wrapper = dt.get_by_name_or_create(service_name, zmq.PUB, port=None)
+        self.wrapper = dt.get_by_name_or_create(service_name, zmq.PUB, port)
         self.stream = self.wrapper.stream
 
     def __call__(self, f):
@@ -370,37 +388,14 @@ class method(object):
 
 
 
-class client_tracker(object):
-    """Used to keep track of connections to services by their names"""
-    by_names = {}
-
-    def __init__(self):
-        pass
-
-    def _by_name_key(self, service_name, socket_type):
-        service_type = socket_type_to_service(socket_type)
-        if isinstance(service_name, (list, tuple)):
-            key = "ip(%s:%s)/%s" % (service_name[0], service_name[1], service_type)
-        else:
-            key = "%s/%s" % (service_name, service_type)
-        return key
-
-    def get_by_name(self, service_name, socket_type):
-        key = self._by_name_key(service_name, socket_type)
-        if self.by_names.has_key(key):
-            return self.by_names[key]
-        return None
-
+class client_tracker(tracker_baseclass):
     def create(self, service_name, socket_type):
         key = self._by_name_key(service_name, socket_type)
         self.by_names[key] = zmq_bonjour_connect_wrapper(socket_type, service_name)
+        print("DEBUG: client_tracker created key %s" % key)
         return self.by_names[key]
 
-    def get_by_name_or_create(self, service_name, socket_type):
-        r = self.get_by_name(service_name, socket_type)
-        if not r:
-            r = self.create(service_name, socket_type)
-        return r
+
 
 ct = client_tracker()
 
