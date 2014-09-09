@@ -13,10 +13,10 @@ import zmqdecorators
 import itertools
 import random
 
-service_name="test_pubsub"
-service_port=5555 # Set to None for random port
+SERVICE_NAME="test_pubsub"
+SERVICE_PORT=5555 # Set to None for random port
 
-@zmqdecorators.signal(service_name, service_port)
+@zmqdecorators.signal(SERVICE_NAME, SERVICE_PORT)
 def bottles(n):
     """What this function actually does, does not matter to the ZMQ PUBlish, the function name is the topic and function arguments rest of the message parts"""
     pass
@@ -28,7 +28,7 @@ def bottles_caller():
     print data
     return bottles(data)
 
-@zmqdecorators.signal(service_name, service_port)
+@zmqdecorators.signal(SERVICE_NAME, SERVICE_PORT)
 def slices(n):
     pass
 
