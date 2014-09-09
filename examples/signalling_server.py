@@ -11,6 +11,10 @@ import zmqdecorators
 SERVICE_NAME="test_signals_rpc"
 SERVICE_PORT=6900
 SIGNALS_PORT=6901
+# None as port binds to random available port
+SERVICE_PORT=None
+SIGNALS_PORT=None
+
 
 class myserver(zmqdecorators.service):
     def __init__(self, service_name, service_port):
