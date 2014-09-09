@@ -377,16 +377,22 @@ class client_tracker(object):
     def __init__(self):
         pass
 
-    def get_by_name(self, service_name, socket_type):
+    def _by_name_key(self, service_name, socket_type):
         service_type = socket_type_to_service(socket_type)
-        key = "%s%s" % (service_name, service_type)
+        if isinstance(service_name, (list, tuple)):
+            key = "ip(%s:%s)/%s" % (service_name[0], service_name[1], service_type)
+        else:
+            key = "%s/%s" % (service_name, service_type)
+        return key
+
+    def get_by_name(self, service_name, socket_type):
+        key = self._by_name_key(service_name, socket_type)
         if self.by_names.has_key(key):
             return self.by_names[key]
         return None
 
     def create(self, service_name, socket_type):
-        service_type = socket_type_to_service(socket_type)
-        key = "%s%s" % (service_name, service_type)
+        key = self._by_name_key(service_name, socket_type)
         self.by_names[key] = zmq_bonjour_connect_wrapper(socket_type, service_name)
         return self.by_names[key]
 
