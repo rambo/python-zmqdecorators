@@ -13,6 +13,7 @@ import zmqdecorators
 
 SERVICE_NAME="test_pubsub"
 SIGNALS_PORT=5555 # Set to None for random port
+SIGNALS_PORT=None
 
 
 class mypublisher(zmqdecorators.service):
