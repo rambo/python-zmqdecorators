@@ -11,22 +11,31 @@ ioloop.install()
 #    sys.path.append(libs_dir)
 import zmqdecorators
 
-
 service_name="test_asyncrpc"
 service_port=6900 # Set to None for random port
 
-@zmqdecorators.method(service_name, service_port)
-def beer(resp, bottles, drinkers):
-    bottles = int(bottles)
-    drinkers = int(drinkers)
-    print "Sending bottles as reply"
-    resp.send("Here's %d bottles of beer for %d drinkers" % (bottles, drinkers))
+class myserver(zmqdecorators.service):
+    def __init__(self, service_name, service_port):
+        super(myserver, self).__init__(service_name, service_port)
+        # TODO: other init code ??
 
-@zmqdecorators.method(service_name, service_port)
-def food(resp, arg, arg2):
-    print "Sending noms as reply"
-    resp.send("Here's %s for the noms (for %s)" % (arg, arg2))
+    def cleanup(self):
+        print("Cleanup called")
+
+    @zmqdecorators.method()
+    def beer(self, resp, bottles, drinkers):
+        bottles = int(bottles)
+        drinkers = int(drinkers)
+        print "Sending bottles as reply"
+        resp.send("Here's %d bottles of beer for %d drinkers" % (bottles, drinkers))
+
+    @zmqdecorators.method()
+    def food(self, resp, arg, arg2):
+        print "Sending noms as reply"
+        resp.send("Here's %s for the noms (for %s)" % (arg, arg2))
 
 
-print "starting ioloop"
-ioloop.IOLoop.instance().start()
+if __name__ == "__main__":
+    instance = myserver(service_name, service_port)
+    print("Starting")
+    instance.run()
