@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import zmq
 from zmq.eventloop import ioloop
 from zmq.eventloop.zmqstream import ZMQStream
@@ -18,9 +19,8 @@ class myserver(zmqdecorators.service):
         super(myserver, self).__init__(service_name, service_port)
         # TODO: other init code ??
 
-    def run(self):
-        print "starting ioloop"
-        ioloop.IOLoop.instance().start()
+    def cleanup(self):
+        print("Cleanup called")
 
     @zmqdecorators.method()
     def beer(self, resp, bottles, drinkers):
@@ -37,4 +37,5 @@ class myserver(zmqdecorators.service):
 
 if __name__ == "__main__":
     instance = myserver(service_name, service_port)
+    print("Starting")
     instance.run()

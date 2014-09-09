@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Utilities and decorators for PyZMQ, emulating the way python-dbus decorators work (which make things super-easy for the developer)"""
 import zmq
 from zmq.eventloop import ioloop
@@ -7,7 +9,8 @@ import time
 import uuid
 import functools
 import bonjour_utilities
-from exceptions import RuntimeError
+from exceptions import RuntimeError,KeyboardInterrupt
+import signal as posixsignal
 
 
 def socket_type_to_service(socket_type):
@@ -43,6 +46,7 @@ class zmq_bonjour_bind_base(object):
     stream = None
     heartbeat_timer = None
     port = None
+    bonjour_registration = None
 
     def _hearbeat(self):
         #print "Sending heartbeat"
@@ -67,7 +71,7 @@ class zmq_bonjour_bind_base(object):
             self.heartbeat_timer = ioloop.PeriodicCallback(self._hearbeat, 1000)
             self.heartbeat_timer.start()
 
-        bonjour_utilities.register_ioloop(ioloop.IOLoop.instance(), service_type, service_name, service_port)
+        self.bonjour_registration = bonjour_utilities.register_ioloop(ioloop.IOLoop.instance(), service_type, service_name, service_port)
 
 
 class zmq_bonjour_bind_wrapper(zmq_bonjour_bind_base):
@@ -110,6 +114,7 @@ class service(zmq_bonjour_bind_base):
     def __init__(self, service_name, service_port=None, service_type=None):
         super(service, self).__init__(zmq.ROUTER, service_name, service_port, service_type)
         self.stream.on_recv(self._method_callback_wrapper)
+        self.ioloop = ioloop.IOLoop.instance()
 
     def _method_callback_wrapper(self, datalist):
         if len(datalist) < 2:
@@ -129,6 +134,35 @@ class service(zmq_bonjour_bind_base):
 
         except AttributeError,e:
             raise RuntimeError("No such method: %s" % method)
+
+    def hook_signals(self):
+        """Hooks common UNIX signals to corresponding handlers"""
+        posixsignal.signal(posixsignal.SIGTERM, self.quit)
+        posixsignal.signal(posixsignal.SIGQUIT, self.quit)
+        posixsignal.signal(posixsignal.SIGHUP, self.reload)
+
+    def reload(self):
+        """Overload this method if you want to handle SIGHUP"""
+        pass
+
+    def cleanup(self):
+        """Overload this method if you need to do cleanups (though atexit would probably be better"""
+        pass
+
+
+    def quit(self):
+        """Quits the IOLoop"""
+        self.ioloop.stop()
+
+    def run(self):
+        """Starts the IOLoop"""
+        self.hook_signals()
+        try:
+            self.ioloop.start()
+        except KeyboardInterrupt:
+            self.quit()
+        finally:
+            self.cleanup()
 
 
 class zmq_bonjour_connect_wrapper(object):

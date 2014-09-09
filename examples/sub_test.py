@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import zmq
 from zmq.eventloop import ioloop
 ioloop.install()

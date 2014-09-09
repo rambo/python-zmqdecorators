@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """utilities built on pybonjour"""
 import pybonjour, select
 from functools import partial
