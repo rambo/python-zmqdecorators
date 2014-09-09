@@ -334,7 +334,12 @@ class signal(object):
     def __call__(self, f):
         def wrapped_f(*args):
             topic = f.__name__
-            self.stream.send_multipart([topic, ] + list(args))
+            # This signal is a class method
+            if (    len(args) >= 1
+                and isinstance(args[0], service_baseclass)):
+                self.stream.send_multipart([topic, ] + list(args[1:]))
+            else:
+                self.stream.send_multipart([topic, ] + list(args))
             f(*args)
         return wrapped_f
 
