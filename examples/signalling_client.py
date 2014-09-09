@@ -17,8 +17,8 @@ class myclient(zmqdecorators.client):
     def __init__(self):
         super(myclient, self).__init__()
         
-        self.wrapper = zmqdecorators.zmq_bonjour_connect_wrapper(zmq.DEALER, SERVICE_NAME)
         zmqdecorators.subscribe_topic(SERVICE_NAME, 'testsignal', self.testsignal_callback)
+        self.wrapper = zmqdecorators.zmq_bonjour_connect_wrapper(zmq.DEALER, SERVICE_NAME)
 
         self.pcb = ioloop_mod.PeriodicCallback(self.request_testsignal, 500)
         self.pcb.start()
