@@ -16,6 +16,8 @@ class bonjour_resolver(object):
     def resolve(self, service_type, service_name=None):
         self.name_filter = service_name
         self.resolve_error = False
+        self.resolved = None
+
         browse_sdRef = pybonjour.DNSServiceBrowse(regtype = service_type, callBack = self._browse_callback)
 
         try:
