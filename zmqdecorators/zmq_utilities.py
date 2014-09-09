@@ -109,12 +109,15 @@ class zmq_bonjour_bind_wrapper(zmq_bonjour_bind_base):
         self.method_callbacks[name].append(callback)
 
 
-class service(zmq_bonjour_bind_base):
+class service_baseclass(zmq_bonjour_bind_base):
     """Baseclass for services in ZMQ with RPC methods"""
-    def __init__(self, service_name, service_port=None, service_type=None):
+    def __init__(self, service_name, service_port=None, service_type=None, ioloop_instance=None):
         super(service, self).__init__(zmq.ROUTER, service_name, service_port, service_type)
         self.stream.on_recv(self._method_callback_wrapper)
-        self.ioloop = ioloop.IOLoop.instance()
+        if ioloop_instance:
+            self.ioloop = ioloop_instance
+        else:
+            self.ioloop = ioloop.IOLoop.instance()
 
     def _method_callback_wrapper(self, datalist):
         if len(datalist) < 2:
@@ -148,7 +151,6 @@ class service(zmq_bonjour_bind_base):
     def cleanup(self):
         """Overload this method if you need to do cleanups (though atexit would probably be better"""
         pass
-
 
     def quit(self):
         """Quits the IOLoop"""
@@ -251,6 +253,42 @@ class zmq_bonjour_connect_wrapper(object):
         """Async method calling wrapper, does not return anything you will need to catch any responses the server might send some other way"""
         self.stream.send_multipart([method, ] + list(args))
 
+
+class client_baseclass(object):
+    """Baseclass for clients, basically just handles some basic housekeeping like signals etc"""
+    def __init__(self, ioloop_instance=None):
+        if ioloop_instance:
+            self.ioloop = ioloop_instance
+        else:
+            self.ioloop = ioloop.IOLoop.instance()
+
+    def hook_signals(self):
+        """Hooks common UNIX signals to corresponding handlers"""
+        posixsignal.signal(posixsignal.SIGTERM, self.quit)
+        posixsignal.signal(posixsignal.SIGQUIT, self.quit)
+        posixsignal.signal(posixsignal.SIGHUP, self.reload)
+
+    def reload(self):
+        """Overload this method if you want to handle SIGHUP"""
+        pass
+
+    def cleanup(self):
+        """Overload this method if you need to do cleanups (though atexit would probably be better"""
+        pass
+
+    def quit(self):
+        """Quits the IOLoop"""
+        self.ioloop.stop()
+
+    def run(self):
+        """Starts the IOLoop"""
+        self.hook_signals()
+        try:
+            self.ioloop.start()
+        except KeyboardInterrupt:
+            self.quit()
+        finally:
+            self.cleanup()
 
 
 class server_tracker(object):

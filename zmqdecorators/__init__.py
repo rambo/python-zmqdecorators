@@ -2,7 +2,8 @@
 
 See examples at https://github.com/rambo/python-zmqdecorators/tree/master/examples
 """
-from zmq_utilities import service
+from zmq_utilities import service_baseclass as service
+from zmq_utilities import client_baseclass as client
 from zmq_utilities import signal
 from zmq_utilities import method
 from zmq_utilities import call 

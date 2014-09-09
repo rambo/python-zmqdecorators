@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import zmq
 from zmq.eventloop import ioloop
-from zmq.eventloop.zmqstream import ZMQStream
 ioloop.install()
 import itertools
 import random
