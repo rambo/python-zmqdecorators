@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import zmq
-from zmq.eventloop import ioloop
-ioloop.install()
+from zmq.eventloop import ioloop as ioloop_mod
 
 #import sys, os
 #libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'zmqdecorators')
@@ -10,30 +9,32 @@ ioloop.install()
 #    sys.path.append(libs_dir)
 import zmqdecorators
 
+class mysubscriber(zmqdecorators.client):
+    def __init__(self):
+        super(mysubscriber, self).__init__()
 
-def bottles_callback(data):
-    """Since we know the exact amount and order of arguments we can get away with not adding *args. Whether adding it to avoid choking in case for channel
-    format changes is a good idea depends on your circumstances (sometimes it's better to catch the change early"""
-    print "in bottles_callback got %s" % repr(data)
+        zmqdecorators.subscribe_topic("test_pubsub", "bottles", self.bottles_callback)
+        zmqdecorators.subscribe_topic("test_pubsub", "slices", self.slices_callback)
+        zmqdecorators.subscribe_topic("test_pubsub", "noargs", self.noargs_callback)
+        zmqdecorators.subscribe_all("test_pubsub", self.all_callback)
 
-def slices_callback(data):
-    print "in slices_callback got %s" % repr(data)
+    def bottles_callback(self, data):
+        """Since we know the exact amount and order of arguments we can get away with not adding *args. Whether adding it to avoid choking in case for channel
+        format changes is a good idea depends on your circumstances (sometimes it's better to catch the change early"""
+        print "in bottles_callback got %s" % repr(data)
 
-def noargs_callback():
-    print "in noargs_callback"
+    def slices_callback(self, data):
+        print "in slices_callback got %s" % repr(data)
 
+    def noargs_callback(self):
+        print "in noargs_callback"
 
-def all_callback(*args):
-    """The generic callback MUST accept any number of arguments (including zero)"""
-    print "in all_callback got %s" % repr(args)
-
-zmqdecorators.subscribe_topic("test_pubsub", "bottles", bottles_callback)
-zmqdecorators.subscribe_topic("test_pubsub", "slices", slices_callback)
-zmqdecorators.subscribe_topic("test_pubsub", "noargs", noargs_callback)
-
-zmqdecorators.subscribe_all("test_pubsub", all_callback)
+    def all_callback(self, *args):
+        """The generic callback MUST accept any number of arguments (including zero)"""
+        print "in all_callback got %s" % repr(args)
 
 
-print "starting ioloop"
-ioloop.IOLoop.instance().start()
-
+if __name__ == "__main__":
+    instance = mysubscriber()
+    print("Starting")
+    instance.run()
