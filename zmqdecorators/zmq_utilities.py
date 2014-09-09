@@ -147,6 +147,8 @@ class zmq_bonjour_connect_wrapper(object):
         self.uuid = uuid.uuid4()
         if not identity:
             self.identity = self.uuid.hex
+        else:
+            self.identity = identity
 
         self.reconnect(socket_type, service_name, service_port=None, service_type=None)
         if socket_type == zmq.SUB:
