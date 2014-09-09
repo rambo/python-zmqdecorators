@@ -112,7 +112,7 @@ class zmq_bonjour_bind_wrapper(zmq_bonjour_bind_base):
 class service_baseclass(zmq_bonjour_bind_base):
     """Baseclass for services in ZMQ with RPC methods"""
     def __init__(self, service_name, service_port=None, service_type=None, ioloop_instance=None):
-        super(service, self).__init__(zmq.ROUTER, service_name, service_port, service_type)
+        super(service_baseclass, self).__init__(zmq.ROUTER, service_name, service_port, service_type)
         self.stream.on_recv(self._method_callback_wrapper)
         if ioloop_instance:
             self.ioloop = ioloop_instance
