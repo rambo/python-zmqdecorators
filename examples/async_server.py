@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import zmq
-from zmq.eventloop import ioloop
-from zmq.eventloop.zmqstream import ZMQStream
-ioloop.install()
 
 #import sys, os
 #libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..')
