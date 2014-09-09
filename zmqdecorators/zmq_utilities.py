@@ -224,6 +224,7 @@ class zmq_bonjour_connect_wrapper(object):
             rr = [None, service_name[0], service_name[1]]
         else:
             rr = bonjour_utilities.resolve(service_type, service_name)
+            #print ("DEBUG: bonjour_utilities.resolve(%s, %s) returned %s" % (service_type,service_name,rr))
         if not rr:
             # TODO raise error or wait ??
             return
@@ -233,12 +234,13 @@ class zmq_bonjour_connect_wrapper(object):
         self.socket.setsockopt(zmq.IDENTITY, self.identity)
         self.stream = ZMQStream(self.socket)
         connection_str =  "tcp://%s:%s" % (rr[1], rr[2])
-        #print("DEBUG: reconnect connection_str=%s" % connection_str)
+        #print("DEBUG: reconnect connection_str=%s (service_type=%s)" % (connection_str, service_type))
         self.socket.connect(connection_str)
 
         # re-register the subscriptions
-        for topic in self.topic_callbacks.keys():
-            self._subscribe_topic(topic)
+        if socket_type == zmq.SUB:
+            for topic in self.topic_callbacks.keys():
+                self._subscribe_topic(topic)
 
         # And set the callback
         self.stream.on_recv(self._topic_callback_wrapper)
