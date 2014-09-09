@@ -11,8 +11,8 @@ ioloop.install()
 #    sys.path.append(libs_dir)
 import zmqdecorators
 
-service_name="test_asyncrpc"
-service_port=6900 # Set to None for random port
+SERVICE_NAME="test_asyncrpc"
+SERVICE_PORT=6900 # Set to None for random port
 
 class myserver(zmqdecorators.service):
     def __init__(self, service_name, service_port):
@@ -36,6 +36,6 @@ class myserver(zmqdecorators.service):
 
 
 if __name__ == "__main__":
-    instance = myserver(service_name, service_port)
+    instance = myserver(SERVICE_NAME, SERVICE_PORT)
     print("Starting")
     instance.run()

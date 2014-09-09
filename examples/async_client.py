@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import zmq
-from zmq.eventloop import ioloop
+from zmq.eventloop import ioloop as ioloop_mod
 import random
 
 #import sys, os
@@ -22,7 +22,7 @@ class myclient(zmqdecorators.client):
         self.stream = self.wrapper.stream
         self.stream.on_recv(self.client_recv_callback)
 
-        self.pcb = ioloop.PeriodicCallback(self.send_random_data, 100)
+        self.pcb = ioloop_mod.PeriodicCallback(self.send_random_data, 100)
         self.pcb.start()
 
     def client_recv_callback(self, *args):
