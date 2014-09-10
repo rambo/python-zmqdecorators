@@ -153,7 +153,7 @@ class service_baseclass(zmq_bonjour_bind_base):
         """Overload this method if you need to do cleanups (though atexit would probably be better"""
         pass
 
-    def quit(self):
+    def quit(self, *args):
         """Quits the IOLoop"""
         self.ioloop.stop()
 
@@ -285,7 +285,7 @@ class client_baseclass(object):
         """Overload this method if you need to do cleanups (though atexit would probably be better"""
         pass
 
-    def quit(self):
+    def quit(self, *args):
         """Quits the IOLoop"""
         self.ioloop.stop()
 
