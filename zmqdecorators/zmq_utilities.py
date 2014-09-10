@@ -113,6 +113,7 @@ class service_baseclass(zmq_bonjour_bind_base):
     """Baseclass for services in ZMQ with RPC methods"""
     def __init__(self, service_name, service_port=None, service_type=None, ioloop_instance=None):
         super(service_baseclass, self).__init__(zmq.ROUTER, service_name, service_port, service_type)
+        self.hook_signals()
         self.stream.on_recv(self._method_callback_wrapper)
         if ioloop_instance:
             self.ioloop = ioloop_instance
@@ -158,7 +159,6 @@ class service_baseclass(zmq_bonjour_bind_base):
 
     def run(self):
         """Starts the IOLoop"""
-        self.hook_signals()
         try:
             self.ioloop.start()
         except KeyboardInterrupt:
@@ -265,6 +265,7 @@ class zmq_bonjour_connect_wrapper(object):
 class client_baseclass(object):
     """Baseclass for clients, basically just handles some basic housekeeping like signals etc"""
     def __init__(self, ioloop_instance=None):
+        self.hook_signals()
         if ioloop_instance:
             self.ioloop = ioloop_instance
         else:
@@ -290,7 +291,6 @@ class client_baseclass(object):
 
     def run(self):
         """Starts the IOLoop"""
-        self.hook_signals()
         try:
             self.ioloop.start()
         except KeyboardInterrupt:
