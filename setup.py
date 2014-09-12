@@ -12,6 +12,7 @@ setup(
     packages=['zmqdecorators',],
     license='GNU LGPL',
     long_description=open('README.md').read(),
+    description='Decorators for pyZMQ to make it almost as easy to use a DBUS',
     install_requires=[
         'tornado>=2.0',
         'pyzmq>=2.0',
