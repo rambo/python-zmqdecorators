@@ -423,8 +423,8 @@ class sync_return_wrapper():
     return_value = None
     ready = False
 
-    def callback(self, *args):
-        self.return_value = args
+    def callback(self, message_parts):
+        self.return_value = message_parts
         self.ready = True
         ioloop.IOLoop.instance().stop()
 

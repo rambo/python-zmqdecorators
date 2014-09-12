@@ -25,8 +25,8 @@ class myclient(zmqdecorators.client):
         self.pcb = ioloop_mod.PeriodicCallback(self.send_random_data, 100)
         self.pcb.start()
 
-    def client_recv_callback(self, *args):
-        print "%s: client_recv_callback got %s" % (self.myname, repr(args))
+    def client_recv_callback(self, message_parts):
+        print "%s: client_recv_callback got %s" % (self.myname, repr(message_parts))
 
     def send_random_data(self):
         data = "%d" % random.randint(0,100000)

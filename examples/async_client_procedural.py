@@ -22,8 +22,8 @@ wrapper = zmqdecorators.zmq_bonjour_connect_wrapper(zmq.DEALER, service_name)
 
 stream = wrapper.stream
 
-def client_recv_callback(*args):
-    print "%s: client_recv_callback got %s" % (myname, repr(args))
+def client_recv_callback(message_parts):
+    print "%s: client_recv_callback got %s" % (myname, repr(message_parts))
 
 stream.on_recv(client_recv_callback)
 

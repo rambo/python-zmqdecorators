@@ -24,12 +24,14 @@ class myserver(zmqdecorators.service):
         bottles = int(bottles)
         drinkers = int(drinkers)
         print "Sending bottles as reply"
-        resp.send("Here's %d bottles of beer for %d drinkers" % (bottles, drinkers))
+        # Remember, ZMQ only deals in strings, so typecast everything (JSON is a good idea too)
+        resp.send("Here's %d bottles of beer for %d drinkers", str(bottles), str(drinkers))
 
     @zmqdecorators.method()
     def food(self, resp, arg, arg2):
         print "Sending noms as reply"
-        resp.send("Here's %s for the noms (for %s)" % (arg, arg2))
+        # Remember, ZMQ only deals in strings, so typecast everything (JSON is a good idea too)
+        resp.send("Here's %s for the noms (for %s ppl)", str(arg), str(arg2))
 
 
 if __name__ == "__main__":
