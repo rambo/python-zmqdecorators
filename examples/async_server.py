@@ -3,9 +3,9 @@
 import zmq
 import zmqdecorators
 
-SERVICE_NAME="test_asyncrpc"
-SERVICE_PORT=6900 # Set to None for random port
-SERVICE_PORT=None
+SERVICE_NAME = "test_asyncrpc"
+SERVICE_PORT = 6900 # Set to None for random port
+SERVICE_PORT = None
 
 class myserver(zmqdecorators.service):
     def __init__(self, service_name, service_port):

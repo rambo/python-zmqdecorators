@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import random
 import zmq
 from zmq.eventloop import ioloop as ioloop_mod
-import random
 import zmqdecorators
 
 SERVICE_NAME="test_asyncrpc"

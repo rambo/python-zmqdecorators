@@ -1,19 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import random
 import zmq
 from zmq.eventloop import ioloop as ioloop_mod
-import random
-
-#import sys, os
-#libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..')
-#if os.path.isdir(libs_dir):                                       
-#    sys.path.append(libs_dir)
 import zmqdecorators
 
 
-SERVICE_NAME="test_pubsub"
-SIGNALS_PORT=5555 # Set to None for random port
-SIGNALS_PORT=None
+SERVICE_NAME = "test_pubsub"
+SIGNALS_PORT = 5555 # Set to None for random port
+SIGNALS_PORT = None
 
 
 class mypublisher(zmqdecorators.service):
