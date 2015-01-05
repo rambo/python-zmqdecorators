@@ -3,15 +3,9 @@
 import zmq
 from zmq.eventloop import ioloop as ioloop_mod
 import random
-
-#import sys, os
-#libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..')
-#if os.path.isdir(libs_dir):                                       
-#    sys.path.append(libs_dir)
 import zmqdecorators
 
 SERVICE_NAME="test_asyncrpc"
-
 
 class myclient(zmqdecorators.client):
     def __init__(self, myname):

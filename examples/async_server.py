@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import zmq
-
-#import sys, os
-#libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..')
-#if os.path.isdir(libs_dir):                                       
-#    sys.path.append(libs_dir)
 import zmqdecorators
 
 SERVICE_NAME="test_asyncrpc"
 SERVICE_PORT=6900 # Set to None for random port
+SERVICE_PORT=None
 
 class myserver(zmqdecorators.service):
     def __init__(self, service_name, service_port):
