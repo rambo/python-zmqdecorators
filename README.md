@@ -15,4 +15,4 @@ Though pybonjour will be installed by pip automagically if you install this pack
 
 Remember to enable global site packages for the ZMQ bindings if using virtualenv.
 
-Pro tip for thos wishing to work on the code <http://guide.python-distribute.org/pip.html#installing-from-a-vcs>
+Pro tip for thos wishing to work on the code <http://guide.python-distribute.org/pip.html#installing-from-a-vcs> (short version checkout then `pip install -e ./`)
