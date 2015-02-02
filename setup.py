@@ -1,4 +1,7 @@
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 def git_version():
     version = 'UNKNOWN'
@@ -11,8 +14,8 @@ def git_version():
 
 setup(
     name='zmqdecorators',
-    version='0.7.3dev-%s' % git_version(),
-#    version='0.7.3',
+#    version='0.7.3dev-%s' % git_version(),
+    version='0.7.3',
     author='Eero "rambo" af Heurlin',
     author_email='rambo@iki.fi',
     packages=['zmqdecorators',],
