@@ -1,15 +1,17 @@
 from distutils.core import setup
-import subprocess
 
-git_version = 'UNKNOWN'
-try:
-    git_version = str(subprocess.check_output(['git', 'rev-parse', '--verify', '--short', 'HEAD'])).strip()
-except subprocess.CalledProcessError,e:
-    print "Got error when trying to read git version: %s" % e
+def git_version():
+    version = 'UNKNOWN'
+    try:
+        import subprocess
+        version = str(subprocess.check_output(['git', 'rev-parse', '--verify', '--short', 'HEAD'])).strip()
+    except subprocess.CalledProcessError,e:
+        print "Got error when trying to read git version: %s" % e
+    return version
 
 setup(
     name='zmqdecorators',
-    version='0.7.3dev-%s' % git_version,
+    version='0.7.3dev-%s' % git_version(),
 #    version='0.7.3',
     author='Eero "rambo" af Heurlin',
     author_email='rambo@iki.fi',
