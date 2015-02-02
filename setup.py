@@ -14,8 +14,8 @@ def git_version():
 
 setup(
     name='zmqdecorators',
-#    version='0.7.3dev-%s' % git_version(),
-    version='0.7.3',
+    version='0.7.4dev-%s' % git_version(),
+#    version='0.7.4',
     author='Eero "rambo" af Heurlin',
     author_email='rambo@iki.fi',
     packages=['zmqdecorators',],
